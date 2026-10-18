@@ -177,15 +177,15 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
   background-size: 260% 260%;
   background-position: var(--bgx, 50%) var(--bgy, 50%);
   mix-blend-mode: color-dodge;
-  filter: saturate(1.1);
-  opacity: calc(var(--fxo) * .5);
+  filter: saturate(.75);
+  opacity: calc(var(--fxo) * .2);
 }
 .fx-conic {
   background:
     conic-gradient(from calc(var(--bgx, 50%) * 3.6) at var(--px, 50%) var(--py, 50%),
       #ff5e7e, #ffd25e, #7bff8a, #5ef0ff, #7c6bff, #ff6bf1, #ff5e7e);
   mix-blend-mode: soft-light;
-  opacity: calc(var(--fxo) * .4);
+  opacity: calc(var(--fxo) * .14);
   -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
           mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
 }
@@ -194,7 +194,7 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
   background-size: 160px 160px;
   background-position: calc(var(--bgx, 50%) * 1.4) calc(var(--bgy, 50%) * 1.4);
   mix-blend-mode: screen;
-  opacity: calc(var(--fxo) * .55);
+  opacity: calc(var(--fxo) * .4);
   -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
           mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
 }
