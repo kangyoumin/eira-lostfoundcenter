@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ea">
+<meta name="format-detection" content="telephone=no">
+<title>EiRA - Lost &amp; Found</title>
+<meta name="description" content="EiRA 1st Album 〈Lost &amp; Found〉 — 사물함 속 잃어버린 기억을 꺼내 보세요.">
+<meta property="og:title" content="EiRA - Lost &amp; Found">
+<meta property="og:description" content="THE 1ST ALBUM · OCT 29, 2026">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EiRA">
+<link rel="preload" as="image" href="assets/home-closed.webp">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="app">
+
+  <!-- 홈: 사물함 -->
+  <section id="home" class="screen is-active" aria-label="홈">
+    <div class="stage" id="homeStage">
+      <img class="layer" id="homeClosed" src="assets/home-closed.webp" alt="" draggable="false">
+      <video class="layer" id="door" src="assets/door.mp4" poster="assets/home-closed.webp"
+             muted playsinline webkit-playsinline preload="auto" disablepictureinpicture></video>
+      <img class="layer" id="homeOpen" src="assets/home-open.webp" alt="" draggable="false">
+      <div class="objs" id="objs"></div>
+      <div class="dock" id="dock"></div>
+      <button type="button" class="tap-open" id="tapOpen" hidden>화면을 눌러 사물함 열기</button>
+    </div>
+  </section>
+
+  <!-- 카드 상세 -->
+  <section id="cards" class="screen" aria-label="포토카드" aria-hidden="true">
+    <div class="stage" id="cardStage">
+      <img class="layer" src="assets/card-bg.webp" alt="" draggable="false">
+      <div class="track" id="track"></div>
+      <div class="pager" id="pager" role="tablist" aria-label="멤버 선택"></div>
+      <button type="button" class="back" id="cardsBack" aria-label="뒤로가기"><img src="assets/back.webp" alt="" draggable="false"></button>
+      <button type="button" class="nav nav--prev" id="navPrev" aria-label="이전 멤버">‹</button>
+      <button type="button" class="nav nav--next" id="navNext" aria-label="다음 멤버">›</button>
+    </div>
+  </section>
+
+  <!-- 음원 페이지 -->
+  <section id="music" class="screen" aria-label="음원 서비스" aria-hidden="true">
+    <div class="stage" id="musicStage">
+      <img class="layer" src="assets/music-bg.webp" alt="" draggable="false">
+      <img class="m-cover" src="assets/music-cover.webp" alt="Lost &amp; Found 앨범 커버" draggable="false">
+      <img class="m-title" src="assets/music-font1.webp" alt="EiRA - Stay" draggable="false">
+      <img class="m-sub" src="assets/music-font2.webp" alt="서비스를 골라주세요" draggable="false">
+      <img class="m-list" src="assets/music-list.webp" alt="Apple Music, Spotify, Deezer, Melon, YouTube Music, genie" draggable="false">
+      <button type="button" class="back" id="musicBack" aria-label="뒤로가기"><img src="assets/back-dark.webp" alt="" draggable="false"></button>
+    </div>
+  </section>
+
+</main>
+
+<script src="layout.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

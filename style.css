@@ -1,0 +1,249 @@
+/* ───────── base ───────── */
+:root {
+  --wall: #f4f1ea;
+  --ink: #82807a;
+  --ease-out: cubic-bezier(.22, .8, .3, 1);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: #e6e1d6;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+img { display: block; -webkit-user-drag: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+#app { position: fixed; inset: 0; background: radial-gradient(120% 90% at 50% 40%, #efeade, #d8d2c5); }
+
+/* ───────── screens ───────── */
+.screen {
+  position: fixed; inset: 0; z-index: 1;
+  overflow: hidden;
+  visibility: hidden; opacity: 0;
+  transition: opacity .38s ease, visibility 0s linear .38s;
+}
+.screen:not(.is-active) { pointer-events: none; }
+.screen.is-active { visibility: visible; opacity: 1; transition: opacity .38s ease, visibility 0s; }
+#cards { z-index: 2; }
+#music { z-index: 3; }
+#music .stage { transform: translateY(3.5%); transition: transform .5s var(--ease-out); }
+#music.is-active .stage { transform: none; }
+
+/* 스테이지: 화면 폭에 꽉 채우고(필요하면 위·아래 여백만 잘라냄) 크기·위치는 app.js(fitStages)가 계산 */
+.stage {
+  position: absolute; overflow: hidden; z-index: 1;
+  left: var(--st-x, 0px); top: var(--st-y, 0px);
+  width: var(--st-w, 100%); height: var(--st-h, 100%);
+  --u: calc(var(--st-h, 800px) / 100);          /* 스테이지 높이의 1% */
+  background: var(--wall);
+  touch-action: none;
+  contain: layout paint;
+}
+/* 양옆이 남는 경우(데스크톱 등) 화면 이미지를 흐리게 깔아 자연스럽게 이어 붙임 */
+.screen::before {
+  content: ""; position: absolute; inset: -6%; z-index: 0;
+  background: var(--bd, none) center / cover no-repeat;
+  filter: blur(22px) saturate(1.05); transform: scale(1.05);
+}
+#home { --bd: url(assets/home-open.webp); }
+#cards { --bd: url(assets/card-bg.webp); }
+#music { --bd: url(assets/music-bg.webp); }
+html.is-desktop .screen::before { background: radial-gradient(120% 90% at 50% 40%, #efeade, #d8d2c5); filter: none; transform: none; }
+html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1px rgba(0,0,0,.04); }
+.layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+
+/* ───────── home ───────── */
+#homeOpen { opacity: 0; transition: opacity .3s ease; }
+#home.is-opened #homeOpen { opacity: 1; }
+#home.is-opened #door { visibility: hidden; transition: visibility 0s linear .4s; }
+
+.objs, .dock { position: absolute; inset: 0; pointer-events: none; }
+.obj {
+  position: absolute; opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.obj.pop { opacity: 1; z-index: 5; animation: pop .46s cubic-bezier(.3, .9, .35, 1.2) both; }
+@keyframes pop {
+  0%   { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  42%  { transform: scale(1.085); filter: drop-shadow(0 calc(var(--u) * .45) calc(var(--u) * .6) rgba(0,0,0,.2)); }
+  100% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+}
+
+.dock { z-index: 6; }
+.dock a {
+  position: absolute; display: block; pointer-events: auto;
+  transform: translate(-50%, -50%);
+  border-radius: 24px;
+}
+.dock a::after {
+  content: ""; position: absolute; inset: 14% 8%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,255,255,.9), rgba(255,255,255,0));
+  opacity: 0; transform: scale(.7);
+}
+.dock a.press::after { animation: dockpress .42s ease-out; }
+@keyframes dockpress { 0% { opacity: .9; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.25); } }
+#home:not(.is-opened) .dock a { pointer-events: none; }
+
+.tap-open {
+  position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%); z-index: 8;
+  padding: 12px 20px; border-radius: 999px;
+  background: rgba(255,255,255,.88); color: #5b574e; font-size: 14px; letter-spacing: -.01em;
+  box-shadow: 0 6px 22px rgba(60, 50, 30, .22);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.tap-open[hidden] { display: none; }
+
+/* ───────── common back button ───────── */
+.back {
+  position: absolute; z-index: 20;
+  left: 8.65%; top: 10.56%;
+  width: 56px; height: 56px; transform: translate(-50%, -50%);
+  display: grid; place-items: center;
+}
+.back img { height: calc(var(--u) * 2.3); width: auto; opacity: .95; transition: transform .2s ease; }
+.back:active img { transform: translateX(-3px); }
+
+/* ───────── cards ───────── */
+.track { position: absolute; inset: 0; touch-action: none; }
+.slide {
+  position: absolute; inset: 0;
+  transform: translate3d(calc(var(--off, 0) * 100% + var(--drag, 0px)), 0, 0);
+  transition: transform .42s var(--ease-out);
+  will-change: transform;
+}
+.track.dragging .slide { transition: none; }
+.slide img.logo, .slide img.type {
+  position: absolute; transform: translate(-50%, -50%); pointer-events: none;
+}
+.slide .logo { filter: drop-shadow(0 calc(var(--u) * .4) calc(var(--u) * .8) rgba(0,0,0,.18)); }
+
+.card {
+  position: absolute; left: 50%; top: 54.8%;
+  width: 69.55%; aspect-ratio: 780 / 1205;
+  transform: translate(-50%, -50%);
+  perspective: 900px;
+}
+.slide.is-entering .card { animation: cardIn .62s var(--ease-out) both; }
+.slide.is-entering .logo, .slide.is-entering .type { animation: fadeUp .6s var(--ease-out) both; }
+@keyframes cardIn { from { opacity: 0; transform: translate(-50%, -46%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes fadeUp { from { opacity: 0; margin-top: calc(var(--u) * 1.6); } to { opacity: 1; margin-top: 0; } }
+
+.card__shadow {
+  position: absolute; inset: 3% 4% -1%; border-radius: 8%;
+  background: rgba(30, 25, 15, .55); filter: blur(calc(var(--u) * 2.2));
+  transform: translate(calc(var(--sx, 0) * 1px), calc(var(--sy, 0) * 1px + var(--u) * 1.4));
+  opacity: .55;
+}
+.card__rot {
+  position: absolute; inset: 0;
+  transform: rotateY(calc(var(--ry, 0) * 1deg)) rotateX(calc(var(--rx, 0) * 1deg)) scale(var(--sc, 1));
+  will-change: transform;
+}
+.card__face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+
+/* 렌티큘러: 윗면은 기본, 기울이면 아랫면이 줄무늬로 교차하며 드러남 */
+.card__face--b {
+  opacity: calc(var(--flip, 0) * 40);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0, #000 calc(var(--flip, 0) * 3px), transparent calc(var(--flip, 0) * 3px), transparent 3px);
+          mask-image: repeating-linear-gradient(90deg, #000 0, #000 calc(var(--flip, 0) * 3px), transparent calc(var(--flip, 0) * 3px), transparent 3px);
+}
+.card__face--b.is-full { -webkit-mask-image: none; mask-image: none; opacity: 1; }
+.card__lens {   /* 렌즈 결 */
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0, rgba(255,255,255,.07) 1px, rgba(0,0,0,.05) 1px, rgba(0,0,0,.05) 3px);
+  mix-blend-mode: overlay; opacity: calc(.35 + var(--fx, 0) * .65);
+  -webkit-mask-image: var(--mask); mask-image: var(--mask);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+}
+
+/* HOLO 효과 — 기울기(포인터) 위치에 따라 무지개 회절 + 반짝이 + 광택이 움직임 */
+.card__fx {
+  position: absolute; inset: 0; pointer-events: none;
+  -webkit-mask-image: var(--mask); mask-image: var(--mask);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  --fxo: calc(.25 + var(--fx, 0) * .75);
+}
+.card__fx > * { position: absolute; inset: 0; }
+.fx-holo {
+  background:
+    repeating-linear-gradient(115deg,
+      rgba(255,119,115,0) 0%, rgba(255,119,115,.95) 3%, rgba(255,237,95,.95) 6%, rgba(168,255,95,.95) 9%,
+      rgba(131,255,247,.95) 12%, rgba(120,148,255,.95) 15%, rgba(216,117,255,.95) 18%, rgba(255,119,115,0) 21%, rgba(255,119,115,0) 34%);
+  background-size: 260% 260%;
+  background-position: var(--bgx, 50%) var(--bgy, 50%);
+  mix-blend-mode: color-dodge;
+  filter: saturate(1.1);
+  opacity: calc(var(--fxo) * .5);
+}
+.fx-conic {
+  background:
+    conic-gradient(from calc(var(--bgx, 50%) * 3.6) at var(--px, 50%) var(--py, 50%),
+      #ff5e7e, #ffd25e, #7bff8a, #5ef0ff, #7c6bff, #ff6bf1, #ff5e7e);
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--fxo) * .4);
+  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
+          mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
+}
+.fx-sparkle {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 16 -10.6'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  background-position: calc(var(--bgx, 50%) * 1.4) calc(var(--bgy, 50%) * 1.4);
+  mix-blend-mode: screen;
+  opacity: calc(var(--fxo) * .55);
+  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
+          mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
+}
+.fx-glare {
+  background: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), hsla(0,0%,100%,.75) 6%, hsla(0,0%,100%,.35) 24%, hsla(0,0%,0%,.18) 95%);
+  mix-blend-mode: overlay;
+  opacity: calc(var(--fxo) * .8);
+}
+.fx-edge {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 22px rgba(255,255,255,.1);
+  mix-blend-mode: screen; opacity: calc(.3 + var(--fx, 0) * .5);
+  border-radius: 6.2% / 4.1%;
+}
+
+/* ───────── pager ───────── */
+.pager {
+  position: absolute; left: 50%; top: 82.75%; transform: translate(-50%, -50%);
+  display: flex; z-index: 15; width: 17.3%; justify-content: space-between; align-items: center;
+}
+.pager button { flex: none; width: 8%; aspect-ratio: 1; padding: 0; position: relative; }
+.pager button::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(255,255,255,.42); transition: background .25s ease, transform .25s ease;
+}
+.pager button::after { content: ""; position: absolute; inset: -14px; }
+.pager button.is-on::before { background: #fff; transform: scale(1.05); }
+
+/* 데스크톱 전용 좌우 이동 버튼 */
+.nav { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .nav {
+    display: grid; place-items: center; position: absolute; top: 54%; z-index: 20;
+    width: 44px; height: 44px; margin-top: -22px; border-radius: 50%;
+    background: rgba(255,255,255,.28); color: #fff; font-size: 26px; line-height: 1;
+    transition: background .2s ease, opacity .2s ease;
+  }
+  .nav:hover { background: rgba(255,255,255,.5); }
+  .nav--prev { left: 2.5%; } .nav--next { right: 2.5%; }
+  .nav[disabled] { opacity: 0; pointer-events: none; }
+}
+
+/* ───────── music ───────── */
+.m-cover, .m-title, .m-sub, .m-list { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
+.m-cover { left: 49.6%; top: 23.2%; width: 45%; filter: drop-shadow(0 calc(var(--u) * 1.2) calc(var(--u) * 2) rgba(60,50,30,.25)); }
+.m-title { left: 49.94%; top: 37.4%; width: 24.5%; }
+.m-sub   { left: 49.94%; top: 40.2%; width: 24.6%; }
+.m-list  { left: 49.94%; top: 68.4%; width: 82.6%; }
+#music .back img { filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .obj.pop, .slide.is-entering .card { transition: none; animation-duration: .01s; }
+}
