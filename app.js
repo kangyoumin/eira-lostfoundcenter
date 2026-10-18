@@ -36,8 +36,8 @@
        나머지는 흐린 배경으로 이어 붙임. 화면이 더 길면 양옆을 살짝 잘라 높이를 채움. */
   const STAGES = [
     { sel: '#homeStage',  A: 976 / 2122,   cT: 0.10, cB: 0.025, topFirst: true },   // 위: 줄만 있는 벽(먼저 자름) / 아래: 서랍 하단 여백(최소한만)
-    { sel: '#cardStage',  A: 1017 / 2211,  cT: 0.06, cB: 0.11 },
-    { sel: '#musicStage', A: 1017 / 2211,  cT: 0.06, cB: 0.06 },
+    { sel: '#cardStage',  A: 1017 / 2211,  cT: 0.045, cB: 0.11 },
+    { sel: '#musicStage', A: 1017 / 2211,  cT: 0.045, cB: 0.06 },
   ];
   const MAX_STRETCH = 0;
   function fitStages() {
