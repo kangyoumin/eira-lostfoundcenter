@@ -61,6 +61,24 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
 #home.is-opened #homeOpen { opacity: 1; }
 #home.is-opened #door { visibility: hidden; transition: visibility 0s linear .4s; }
 
+.logo-swing {
+  position: absolute; pointer-events: none; opacity: 0; transition: opacity .3s ease;
+  transform-origin: 43.28% 0;                 /* 두 줄 사이 가운데, 줄이 걸린 위쪽 끝 */
+  will-change: transform;
+}
+#home.is-opened .logo-swing { opacity: 1; }
+.logo-swing.swing { animation: logoswing 2.6s ease-in-out both; }
+@keyframes logoswing {
+  0%   { transform: rotate(0deg); }
+  13%  { transform: rotate(3.2deg); }
+  30%  { transform: rotate(-2.5deg); }
+  47%  { transform: rotate(1.8deg); }
+  63%  { transform: rotate(-1.2deg); }
+  79%  { transform: rotate(.6deg); }
+  91%  { transform: rotate(-.2deg); }
+  100% { transform: rotate(0deg); }
+}
+
 .objs, .dock { position: absolute; inset: 0; pointer-events: none; }
 .obj {
   position: absolute; opacity: 0;

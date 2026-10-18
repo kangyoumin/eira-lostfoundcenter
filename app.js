@@ -16,7 +16,7 @@
     { id: 'jian',  obj: 'cam',  name: '지안' },
     { id: 'jaein', obj: 'note', name: '재인' },
   ];
-  const OBJ_ORDER = ['pick', 'mp3', 'cam', 'key', 'note'];   // 앞에 놓인 물건부터 판정
+  const OBJ_ORDER = ['pick', 'mp3', 'cam', 'key', 'note', 'logo'];   // 앞에 놓인 물건부터 판정
   const LINKS = {
     rec:  'https://youtu.be/-_FzObZDppM?si=XwvR9tyhCVJ4otbS',   // 임시 링크
     like: 'https://www.instagram.com/lf_eira?xtok=NnV4ZzE1M2Z0N3Vk&utm_source=qr',
@@ -191,7 +191,20 @@
   });
   if (reduceMotion) setOpened(); else startDoor();
 
+  // 줄에 걸린 로고: 터치하면 흔들림
+  const logoEl = $('#logoSwing');
+  Object.assign(logoEl.style, {
+    left: (LY.logo.x / SW * 100) + '%', top: (LY.logo.y / SH * 100) + '%',
+    width: (LY.logo.w / SW * 100) + '%', height: (LY.logo.h / SH * 100) + '%',
+  });
+  function swingLogo() {
+    logoEl.classList.remove('swing'); void logoEl.offsetWidth;
+    if (!reduceMotion) logoEl.classList.add('swing');
+  }
+  logoEl.addEventListener('animationend', () => logoEl.classList.remove('swing'));
+
   // 물건 컷아웃(팝 효과 + 정확한 터치 판정용)
+  const BOX = Object.assign({}, LY.objs, { logo: LY.logo });
   const objEls = {}, masks = {};
   function makeMask(k, img) {
     try {
@@ -216,8 +229,11 @@
     objEls[k] = img;
   });
 
+  if (logoEl.complete && logoEl.naturalWidth) makeMask('logo', logoEl);
+  else logoEl.addEventListener('load', () => makeMask('logo', logoEl));
+
   function alphaAt(k, sx, sy) {
-    const o = LY.objs[k];
+    const o = BOX[k];
     const lx = (sx - o.x) / o.w, ly = (sy - o.y) / o.h;
     if (lx < 0 || ly < 0 || lx >= 1 || ly >= 1) return 0;
     const m = masks[k];
@@ -241,6 +257,7 @@
     if (e.target.closest('.dock')) return;
     const k = pickObject(e.clientX, e.clientY);
     if (!k) return;
+    if (k === 'logo') { swingLogo(); return; }
     busy = true;
     Motion.request();                               // 사용자 터치 안에서 호출해야 iOS 권한창이 뜸
     const el = objEls[k];
