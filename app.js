@@ -165,31 +165,31 @@
   })();
 
   /* ───────────────────────── 홈 ───────────────────────── */
-  const door = $('#door'), homeStage = $('#homeStage'), tapOpen = $('#tapOpen');
+  const door = $('#door'), homeStage = $('#homeStage');
   const objsEl = $('#objs'), dockEl = $('#dock');
-  let opened = false, busy = false, doorStartedAt = 0;
+  let opened = false, busy = false, doorStartedAt = 0, started = false;
 
   function setOpened() {
     if (opened) return;
     opened = true;
     homeEl.classList.add('is-opened');
-    tapOpen.hidden = true;
   }
   function startDoor() {
+    if (started) return;
+    started = true;
     doorStartedAt = performance.now();
     const p = door.play();
-    if (p && p.catch) p.catch(() => { tapOpen.hidden = false; });   // 자동재생이 막힌 경우(저전력 모드 등)
+    if (p && p.catch) p.catch(() => { started = false; });   // 재생이 막힌 경우(저전력 모드 등) 다시 누르면 재시도
   }
   door.addEventListener('ended', setOpened);
   door.addEventListener('error', setOpened);
-  door.addEventListener('playing', () => { tapOpen.hidden = true; doorStartedAt = performance.now(); setTimeout(() => Cards.ensure(), 1200); });
-  tapOpen.addEventListener('click', (e) => { e.stopPropagation(); startDoor(); });
+  door.addEventListener('playing', () => { doorStartedAt = performance.now(); setTimeout(() => Cards.ensure(), 1200); });
   homeStage.addEventListener('pointerdown', () => {            // 영상 도중 터치하면 건너뛰기
     if (!opened && !door.paused && door.duration && performance.now() - doorStartedAt > 700) {
       door.currentTime = Math.max(0, door.duration - 0.04);
     }
   });
-  if (reduceMotion) setOpened(); else startDoor();
+  if (reduceMotion) setOpened();      // 그 외에는 사용자가 문을 누르면 startDoor()
 
   // 줄에 걸린 로고: 터치하면 흔들림
   const logoEl = $('#logoSwing');
@@ -252,7 +252,15 @@
     return null;
   }
 
+  // 문 영역(영상 좌표) — 닫힌 문을 누르면 열림
+  const DOOR = { x0: 40, x1: 936, y0: 520, y1: 1730 };
+  function inDoor(e) {
+    const r = homeStage.getBoundingClientRect();
+    const x = (e.clientX - r.left) / (r.width / SW), y = (e.clientY - r.top) / (r.height / SH);
+    return x >= DOOR.x0 && x <= DOOR.x1 && y >= DOOR.y0 && y <= DOOR.y1;
+  }
   homeStage.addEventListener('click', (e) => {
+    if (!opened && !started && inDoor(e)) { startDoor(); return; }
     if (!opened || busy) return;
     if (e.target.closest('.dock')) return;
     const k = pickObject(e.clientX, e.clientY);
@@ -306,9 +314,8 @@
             <div class="card__rot">
               <img class="card__face card__face--a" src="assets/${m.id}-card1.webp" alt="" draggable="false">
               <img class="card__face card__face--b" src="assets/${m.id}-card2.webp" alt="" draggable="false">
-              <div class="card__lens"></div>
               <div class="card__fx">
-                <div class="fx-holo"></div><div class="fx-conic"></div><div class="fx-sparkle"></div>
+                <div class="fx-holo"></div><div class="fx-sparkle"></div>
                 <div class="fx-glare"></div><div class="fx-edge"></div>
               </div>
             </div>
@@ -363,11 +370,11 @@
       el.style.setProperty('--py', py.toFixed(1) + '%');
       el.style.setProperty('--bgx', px.toFixed(1) + '%');
       el.style.setProperty('--bgy', py.toFixed(1) + '%');
+      el.style.setProperty('--gp', (50 + (nx * 0.75 + ny * 0.45) * 70).toFixed(1) + '%');   // 빛줄기 위치(대각선 이동)
       el.style.setProperty('--fx', fx.toFixed(3));
       el.style.setProperty('--flip', flip.toFixed(3));
       el.style.setProperty('--sx', (-nx * 16).toFixed(1));
       el.style.setProperty('--sy', (-ny * 16).toFixed(1));
-      s.faceB.classList.toggle('is-full', flip > 0.985);
     }
 
     function frame(t) {

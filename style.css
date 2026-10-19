@@ -116,6 +116,11 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 .tap-open[hidden] { display: none; }
+.tap-open { animation: tapPulse 2.2s ease-in-out infinite; }
+@keyframes tapPulse {
+  0%, 100% { box-shadow: 0 6px 22px rgba(60, 50, 30, .22); opacity: .92; }
+  50%      { box-shadow: 0 6px 30px rgba(60, 50, 30, .34), 0 0 0 7px rgba(255,255,255,.35); opacity: 1; }
+}
 
 /* ───────── common back button ───────── */
 .back {
@@ -166,19 +171,7 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
 .card__face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 
 /* 렌티큘러: 윗면은 기본, 기울이면 아랫면이 줄무늬로 교차하며 드러남 */
-.card__face--b {
-  opacity: calc(var(--flip, 0) * 40);
-  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0, #000 calc(var(--flip, 0) * 3px), transparent calc(var(--flip, 0) * 3px), transparent 3px);
-          mask-image: repeating-linear-gradient(90deg, #000 0, #000 calc(var(--flip, 0) * 3px), transparent calc(var(--flip, 0) * 3px), transparent 3px);
-}
-.card__face--b.is-full { -webkit-mask-image: none; mask-image: none; opacity: 1; }
-.card__lens {   /* 렌즈 결 */
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0, rgba(255,255,255,.07) 1px, rgba(0,0,0,.05) 1px, rgba(0,0,0,.05) 3px);
-  mix-blend-mode: overlay; opacity: calc(.35 + var(--fx, 0) * .65);
-  -webkit-mask-image: var(--mask); mask-image: var(--mask);
-  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
-}
+.card__face--b { opacity: var(--flip, 0); }   /* 렌티큘러 줄무늬 없이 부드럽게 교차 */
 
 /* HOLO 효과 — 기울기(포인터) 위치에 따라 무지개 회절 + 반짝이 + 광택이 움직임 */
 .card__fx {
@@ -189,24 +182,15 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
 }
 .card__fx > * { position: absolute; inset: 0; }
 .fx-holo {
-  background:
-    repeating-linear-gradient(115deg,
-      rgba(255,119,115,0) 0%, rgba(255,119,115,.95) 3%, rgba(255,237,95,.95) 6%, rgba(168,255,95,.95) 9%,
-      rgba(131,255,247,.95) 12%, rgba(120,148,255,.95) 15%, rgba(216,117,255,.95) 18%, rgba(255,119,115,0) 21%, rgba(255,119,115,0) 34%);
-  background-size: 260% 260%;
-  background-position: var(--bgx, 50%) var(--bgy, 50%);
+  background: linear-gradient(115deg,
+      rgba(255,119,115,0) calc(var(--gp, 50%) - 26%),
+      rgba(255,119,115,.95) calc(var(--gp, 50%) - 17%), rgba(255,237,95,.95) calc(var(--gp, 50%) - 9%),
+      rgba(168,255,95,.95) calc(var(--gp, 50%) - 2%), rgba(131,255,247,.95) calc(var(--gp, 50%) + 5%),
+      rgba(120,148,255,.95) calc(var(--gp, 50%) + 12%), rgba(216,117,255,.95) calc(var(--gp, 50%) + 19%),
+      rgba(255,119,115,0) calc(var(--gp, 50%) + 26%));
   mix-blend-mode: color-dodge;
-  filter: saturate(.75);
-  opacity: calc(var(--fxo) * .2);
-}
-.fx-conic {
-  background:
-    conic-gradient(from calc(var(--bgx, 50%) * 3.6) at var(--px, 50%) var(--py, 50%),
-      #ff5e7e, #ffd25e, #7bff8a, #5ef0ff, #7c6bff, #ff6bf1, #ff5e7e);
-  mix-blend-mode: soft-light;
-  opacity: calc(var(--fxo) * .14);
-  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
-          mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.15) 100%);
+  filter: saturate(.6);
+  opacity: calc(var(--fxo) * .04);
 }
 .fx-sparkle {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 16 -10.6'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
@@ -214,13 +198,18 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
   background-position: calc(var(--bgx, 50%) * 1.4) calc(var(--bgy, 50%) * 1.4);
   mix-blend-mode: screen;
   opacity: calc(var(--fxo) * .4);
-  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
-          mask-image: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), #000 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.05) 110%);
+  -webkit-mask-image: linear-gradient(115deg, rgba(0,0,0,.22) calc(var(--gp, 50%) - 38%), #000 var(--gp, 50%), rgba(0,0,0,.22) calc(var(--gp, 50%) + 38%));
+          mask-image: linear-gradient(115deg, rgba(0,0,0,.22) calc(var(--gp, 50%) - 38%), #000 var(--gp, 50%), rgba(0,0,0,.22) calc(var(--gp, 50%) + 38%));
 }
-.fx-glare {
-  background: radial-gradient(farthest-corner circle at var(--px, 50%) var(--py, 50%), hsla(0,0%,100%,.75) 6%, hsla(0,0%,100%,.35) 24%, hsla(0,0%,0%,.18) 95%);
-  mix-blend-mode: overlay;
-  opacity: calc(var(--fxo) * .8);
+.fx-glare {   /* 대각선으로 흐르는 빛줄기 (하나) */
+  background: linear-gradient(115deg,
+      rgba(255,255,255,0) calc(var(--gp, 50%) - 30%),
+      rgba(255,255,255,.30) calc(var(--gp, 50%) - 9%),
+      rgba(255,255,255,.62) var(--gp, 50%),
+      rgba(255,255,255,.30) calc(var(--gp, 50%) + 9%),
+      rgba(255,255,255,0) calc(var(--gp, 50%) + 30%));
+  mix-blend-mode: soft-light;
+  opacity: calc(var(--fxo) * 1);
 }
 .fx-edge {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 22px rgba(255,255,255,.1);
