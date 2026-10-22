@@ -249,6 +249,9 @@
       const pts = d ? [[d,0],[-d,0],[0,d],[0,-d],[d*.7,d*.7],[-d*.7,d*.7],[d*.7,-d*.7],[-d*.7,-d*.7]] : [[0,0]];
       for (const k of OBJ_ORDER) for (const [dx, dy] of pts) if (alphaAt(k, sx + dx, sy + dy) > 40) return k;
     }
+    // 이미지 판독이 안 되는 기종에서도 로고가 반응하도록: 로고(줄 포함) 영역 전체를 사각형으로도 판정
+    const lg = LY.logo, m = 10;
+    if (sx >= lg.x - m && sx <= lg.x + lg.w + m && sy >= lg.y - m && sy <= lg.y + lg.h + m) return 'logo';
     return null;
   }
 
