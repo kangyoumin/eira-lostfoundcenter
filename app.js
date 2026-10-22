@@ -18,12 +18,11 @@
   ];
   const OBJ_ORDER = ['pick', 'mp3', 'cam', 'key', 'note', 'logo'];   // 앞에 놓인 물건부터 판정
   const LINKS = {
-    rec:  'https://youtu.be/-_FzObZDppM?si=XwvR9tyhCVJ4otbS',   // 임시 링크
     like: 'https://www.instagram.com/lf_eira?xtok=NnV4ZzE1M2Z0N3Vk&utm_source=qr',
     pin:  'https://kr.pinterest.com/shin02sy1010/lost-found/',
   };
   const DOCK = [   // 하단 서랍 버튼 (영상 좌표 기준 중심)
-    { id: 'rec',   label: '유튜브',     cx: 196, cy: 1940, href: LINKS.rec },
+    { id: 'rec',   label: '유튜브',     cx: 196, cy: 1940, soon: true },   // 링크 준비되면 href: 'https://...' 로 교체
     { id: 'music', label: '음원 듣기',   cx: 408, cy: 1932 },
     { id: 'like',  label: '인스타그램',  cx: 607, cy: 1941, href: LINKS.like },
     { id: 'pin',   label: '핀터레스트',  cx: 808, cy: 1920, href: LINKS.pin },
@@ -275,11 +274,21 @@
     setTimeout(() => { openCards(idx); busy = false; }, 340);
   });
 
+  // 안내 팝업(토스트)
+  const toastEl = $('#toast');
+  let toastTimer = 0;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 1800);
+  }
+
   // 하단 서랍 버튼
   DOCK.forEach((d) => {
     const a = document.createElement('a');
     a.setAttribute('aria-label', d.label);
-    a.href = d.href || '#music';
+    a.href = d.href || (d.soon ? '#' : '#music');
     if (d.href) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
     const w = 160, h = 150;
     Object.assign(a.style, {
@@ -287,7 +296,8 @@
       width: (w / SW * 100) + '%', height: (h / SH * 100) + '%',
     });
     a.addEventListener('pointerdown', () => { a.classList.remove('press'); void a.offsetWidth; a.classList.add('press'); });
-    if (!d.href) a.addEventListener('click', (e) => { e.preventDefault(); openMusic(); });
+    if (d.soon) a.addEventListener('click', (e) => { e.preventDefault(); showToast('준비 중입니다.'); });
+    else if (!d.href) a.addEventListener('click', (e) => { e.preventDefault(); openMusic(); });
     dockEl.appendChild(a);
   });
 
