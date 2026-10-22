@@ -212,7 +212,7 @@
       const c = document.createElement('canvas');
       c.width = img.naturalWidth; c.height = img.naturalHeight;
       const x = c.getContext('2d', { willReadFrequently: true });
-      x.drawImage(img, 0, 0);
+      x.drawImage(img, 0, 0, c.width, c.height);     // 이미지가 해상도별(srcset)로 바뀌어도 전체가 캔버스에 들어오도록 크기를 지정
       masks[k] = { data: x.getImageData(0, 0, c.width, c.height).data, w: c.width, h: c.height };
     } catch (_) { /* file:// 등에서 막히면 사각형 판정으로 대체 */ }
   }
