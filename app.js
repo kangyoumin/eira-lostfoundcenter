@@ -202,6 +202,7 @@
     if (!reduceMotion) logoEl.classList.add('swing');
   }
   logoEl.addEventListener('animationend', () => logoEl.classList.remove('swing'));
+  if (logoEl.decode) logoEl.decode().catch(() => {});      // 문이 열리기 전에 미리 디코딩해 둠(열리는 순간 깨져 보이는 것 방지)
 
   // 물건 컷아웃(팝 효과 + 정확한 터치 판정용)
   const BOX = Object.assign({}, LY.objs, { logo: LY.logo });

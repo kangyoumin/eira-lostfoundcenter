@@ -64,7 +64,6 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
 .logo-swing {
   position: absolute; pointer-events: none; opacity: 0; transition: opacity .3s ease;
   transform-origin: 43.28% 0;                 /* 두 줄 사이 가운데, 줄이 걸린 위쪽 끝 */
-  will-change: transform;
 }
 #home.is-opened .logo-swing { opacity: 1; }
 .logo-swing.swing { animation: logoswing 2.6s ease-in-out both; }
@@ -197,7 +196,7 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
   background-size: 160px 160px;
   background-position: calc(var(--bgx, 50%) * 1.4) calc(var(--bgy, 50%) * 1.4);
   mix-blend-mode: screen;
-  opacity: calc(var(--fxo) * .4);
+  opacity: calc(var(--fxo) * .3);
   -webkit-mask-image: linear-gradient(115deg, rgba(0,0,0,.22) calc(var(--gp, 50%) - 38%), #000 var(--gp, 50%), rgba(0,0,0,.22) calc(var(--gp, 50%) + 38%));
           mask-image: linear-gradient(115deg, rgba(0,0,0,.22) calc(var(--gp, 50%) - 38%), #000 var(--gp, 50%), rgba(0,0,0,.22) calc(var(--gp, 50%) + 38%));
 }
@@ -209,7 +208,7 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
       rgba(255,255,255,.30) calc(var(--gp, 50%) + 9%),
       rgba(255,255,255,0) calc(var(--gp, 50%) + 30%));
   mix-blend-mode: soft-light;
-  opacity: calc(var(--fxo) * 1);
+  opacity: calc(var(--fxo) * .75);
 }
 .fx-edge {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 22px rgba(255,255,255,.1);
@@ -235,8 +234,8 @@ html.is-desktop .stage { box-shadow: 0 30px 80px rgba(70, 60, 40, .28), 0 0 0 1p
 @media (hover: hover) and (pointer: fine) {
   .nav {
     display: grid; place-items: center; position: absolute; top: 54%; z-index: 20;
-    width: 44px; height: 44px; margin-top: -22px; border-radius: 50%;
-    background: rgba(255,255,255,.28); color: #fff; font-size: 26px; line-height: 1;
+    width: 40px; height: 40px; margin-top: -22px; border-radius: 50%;
+    background: rgba(255,255,255,.28); color: #fff; font-size: 20px; line-height: 0;
     transition: background .2s ease, opacity .2s ease;
   }
   .nav:hover { background: rgba(255,255,255,.5); }
